@@ -617,24 +617,46 @@
      الإرسال إلى Cloudflare Worker
      ================================================================ */
 
-  // عقد الاستجابة المتوقع من الـ Worker (عدّل هذه الدالة إن كان الـ Worker يعيد صيغة مختلفة):
-  // نعتبر العملية ناجحة فقط إذا كانت حالة HTTP ضمن 2xx والجسم JSON يحتوي ok:true أو success:true.
-  // لا نعرض النجاح لمجرد أن الطلب وصل.
+  // عقد الـ Worker (مأخوذ من الصفحة التي كانت تعمل):
+  //   الطلب:    POST بصيغة JSON على الشكل { "message": "نص الرسالة" }
+  //   الاستجابة: JSON فيه ok:true عند النجاح (استجابة Telegram)، وإلا يُعد الإرسال فاشلًا.
   async function isSuccessfulResponse(response) {
-    if (!response.ok) return false;
     let data;
     try { data = await response.json(); } catch (_) { return false; }
-    return !!data && (data.ok === true || data.success === true);
+    return !!data && data.ok === true;
   }
 
-  async function sendToWorker(payload) {
+  // بناء نص رسالة Telegram (التنسيق يتم هنا لأن الـ Worker يستقبل نصًا جاهزًا)
+  function buildMessage(d) {
+    const when = new Date(d.submittedAt).toLocaleString('ar-IQ', {
+      timeZone: 'Asia/Baghdad',
+      year: 'numeric', month: 'long', day: 'numeric',
+      hour: '2-digit', minute: '2-digit'
+    });
+    const lines = [
+      '📝 تسجيل طالب جديد',
+      '',
+      '👤 الاسم الرباعي: ' + d.fullName,
+      '',
+      '🎓 الشعبة الحالية: ' + d.section,
+      '',
+      d.isTransferStudent
+        ? '🔄 حالة الانتقال: طالب منتقل هذا العام'
+        : '🔄 حالة الانتقال: لم يحدد انتقالًا من شعبة أخرى'
+    ];
+    if (d.isTransferStudent) lines.push('', '📌 الشعبة السابقة: ' + d.previousSection);
+    lines.push('', '🕒 وقت التسجيل: ' + when);
+    return lines.join('\n');
+  }
+
+  async function sendToWorker(message) {
     const controller = new AbortController();
     const timer = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
     try {
       const response = await fetch(WORKER_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' }, // يستلزم أن يعالج الـ Worker طلب OPTIONS (CORS)
-        body: JSON.stringify(payload),
+        body: JSON.stringify({ message }),
         signal: controller.signal,
         cache: 'no-store',
         credentials: 'omit',
@@ -680,7 +702,7 @@
 
     setLoading(true);
     try {
-      const ok = await sendToWorker(payload);
+      const ok = await sendToWorker(buildMessage(payload));
       if (!ok) { showFailure(''); return; }
 
       // نجاح فعلي: عرض الاسم بأمان عبر textContent (بدون innerHTML)
