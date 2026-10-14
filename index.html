@@ -1,0 +1,703 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<meta name="referrer" content="no-referrer">
+<title>تسجيل أسماء طلبة شعبة B</title>
+
+<!-- الخط اختياري: إن تعذّر تحميله يُستخدم أقرب خط عربي متوفر في الجهاز -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+  /* ========== المتغيرات ========== */
+  :root {
+    --navy: #14233f;
+    --navy-2: #1d3158;
+    --ink: #1b2430;
+    --muted: #5a6574;
+    --line: #d9dfe7;
+    --paper: #ffffff;
+    --bg: #eef1f5;
+    --teal: #0e7c86;
+    --focus: #2563eb;
+    --err: #b3261e;
+    --err-bg: #fdf0ef;
+    --ok: #1c7a4d;
+    --ok-bg: #eaf6ef;
+    --note-bg: #fff7e2;
+    --note-line: #e6c978;
+    --note-ink: #5e4508;
+    --radius: 18px;
+    --font: "IBM Plex Sans Arabic", "Segoe UI", Tahoma, "Noto Sans Arabic", system-ui, sans-serif;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+
+  body {
+    margin: 0;
+    min-height: 100vh;
+    min-height: 100dvh;
+    font-family: var(--font);
+    color: var(--ink);
+    line-height: 1.7;
+    background-color: var(--bg);
+    /* خلفية هادئة: تدرجات خفيفة + شبكة نقاط دقيقة */
+    background-image:
+      radial-gradient(60rem 30rem at 100% -10%, rgba(29, 49, 88, .10), transparent 60%),
+      radial-gradient(50rem 30rem at -10% 110%, rgba(14, 124, 134, .10), transparent 60%),
+      radial-gradient(rgba(20, 35, 63, .08) 1px, transparent 1px);
+    background-size: auto, auto, 22px 22px;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    padding: clamp(1rem, 4vw, 3rem) 1rem;
+  }
+
+  .shell { width: 100%; max-width: 640px; }
+
+  /* ========== البطاقة ========== */
+  .card {
+    background: var(--paper);
+    border-radius: var(--radius);
+    box-shadow: 0 1px 2px rgba(20, 35, 63, .06), 0 12px 32px rgba(20, 35, 63, .10);
+    overflow: hidden;
+  }
+
+  .card-head {
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+    padding: clamp(1.5rem, 5vw, 2.25rem);
+    color: #fff;
+    background: linear-gradient(135deg, var(--navy) 0%, var(--navy-2) 100%);
+  }
+  /* حرف B الكبير: العنصر البصري المميز الوحيد في الصفحة */
+  .card-head .mono {
+    position: absolute;
+    z-index: -1;
+    left: -.4rem;
+    top: -2.6rem;
+    font: 700 13rem/1 Georgia, "Times New Roman", serif;
+    color: rgba(255, 255, 255, .07);
+    pointer-events: none;
+    user-select: none;
+    direction: ltr;
+  }
+
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: .45rem;
+    padding: .3rem .85rem .3rem .75rem;
+    margin-bottom: 1rem;
+    font-size: .85rem;
+    font-weight: 500;
+    color: #d8f3f5;
+    background: rgba(14, 124, 134, .35);
+    border: 1px solid rgba(160, 230, 236, .4);
+    border-radius: 999px;
+  }
+  .badge svg { width: 16px; height: 16px; }
+
+  h1 {
+    margin: 0 0 .5rem;
+    font-size: clamp(1.55rem, 4.6vw, 2.05rem);
+    font-weight: 700;
+    line-height: 1.35;
+  }
+  .card-head p { margin: 0; max-width: 34rem; color: #cdd6e6; font-size: .98rem; }
+
+  /* ========== النموذج ========== */
+  form, .success { padding: clamp(1.25rem, 4.5vw, 2.1rem); }
+  .stack > * + * { margin-top: 1.35rem; }
+
+  fieldset { border: 0; margin: 0; padding: 0; min-width: 0; }
+  legend, .label {
+    display: block;
+    padding: 0;
+    margin-bottom: .5rem;
+    font-weight: 600;
+    font-size: 1rem;
+  }
+  .req { color: var(--err); margin-inline-start: .2rem; }
+  .hint { margin: 0 0 .55rem; color: var(--muted); font-size: .88rem; }
+
+  .field { position: relative; }
+  .field > svg.lead {
+    position: absolute;
+    inset-inline-start: .9rem;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 20px; height: 20px;
+    color: #7b8798;
+    pointer-events: none;
+  }
+
+  input[type="text"], select {
+    width: 100%;
+    min-height: 52px;
+    padding: .7rem 1rem;
+    font: inherit;
+    font-size: 1rem;
+    color: var(--ink);
+    background: #fff;
+    border: 1.5px solid var(--line);
+    border-radius: 12px;
+    transition: border-color .2s, box-shadow .2s, background-color .2s;
+  }
+  input[type="text"] { padding-inline-start: 2.8rem; }
+  input::placeholder { color: #8b96a5; }
+
+  select {
+    appearance: none;
+    -webkit-appearance: none;
+    padding-inline-end: 2.6rem;
+    cursor: pointer;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%235a6574' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-size: 18px;
+    background-position: left .9rem center;
+  }
+
+  input[type="text"]:hover, select:hover { border-color: #b5c0cd; }
+  input:focus-visible, select:focus-visible, button:focus-visible {
+    outline: 3px solid var(--focus);
+    outline-offset: 2px;
+  }
+  input:focus-visible, select:focus-visible { border-color: var(--focus); }
+
+  [aria-invalid="true"] { border-color: var(--err) !important; background-color: var(--err-bg); }
+
+  .error {
+    display: flex;
+    align-items: flex-start;
+    gap: .4rem;
+    margin: .5rem 0 0;
+    color: var(--err);
+    font-size: .9rem;
+    font-weight: 500;
+  }
+  .error[hidden] { display: none; }
+  .error svg { flex: none; width: 18px; height: 18px; margin-top: .2rem; }
+
+  /* ========== مربعات الاختيار ========== */
+  .check {
+    display: flex;
+    align-items: flex-start;
+    gap: .8rem;
+    padding: .95rem 1rem;
+    background: #fff;
+    border: 1.5px solid var(--line);
+    border-radius: 12px;
+    cursor: pointer;
+    transition: border-color .2s, background-color .2s;
+  }
+  .check:hover { border-color: #b5c0cd; }
+  .check:has(input:checked) { border-color: var(--navy-2); background: #f4f7fc; }
+  .check.invalid { border-color: var(--err); background: var(--err-bg); }
+  .check span { font-size: 1rem; }
+
+  .check input {
+    appearance: none;
+    -webkit-appearance: none;
+    flex: none;
+    width: 24px; height: 24px;
+    margin: .1rem 0 0;
+    background: #fff;
+    border: 2px solid #94a1b3;
+    border-radius: 7px;
+    cursor: pointer;
+    transition: background-color .15s, border-color .15s, transform .15s;
+  }
+  .check input:checked {
+    background: var(--navy) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='3.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m5 12 5 5L20 7'/%3E%3C/svg%3E") center / 15px no-repeat;
+    border-color: var(--navy);
+  }
+  .check input:active { transform: scale(.92); }
+  .check input:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
+
+  /* ========== إظهار قائمة الشعبة السابقة بسلاسة ========== */
+  .reveal {
+    display: grid;
+    grid-template-rows: 0fr;
+    opacity: 0;
+    transition: grid-template-rows .35s ease, opacity .3s ease;
+  }
+  .reveal.open { grid-template-rows: 1fr; opacity: 1; }
+  .reveal > .reveal-inner { overflow: hidden; min-height: 0; }
+  .reveal-body { padding-top: 1rem; }
+
+  /* ========== التنبيه ========== */
+  .notice {
+    display: flex;
+    gap: .8rem;
+    padding: 1rem 1.1rem;
+    color: var(--note-ink);
+    background: var(--note-bg);
+    border: 1px solid var(--note-line);
+    border-radius: 12px;
+    font-size: .95rem;
+  }
+  .notice svg { flex: none; width: 22px; height: 22px; margin-top: .2rem; color: #a8780f; }
+  .notice p { margin: 0; }
+  .notice strong { font-weight: 700; }
+
+  /* ========== زر الإرسال ========== */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: .6rem;
+    width: 100%;
+    min-height: 56px;
+    padding: .8rem 1.5rem;
+    font: inherit;
+    font-size: 1.08rem;
+    font-weight: 600;
+    color: #fff;
+    background: var(--navy);
+    border: 0;
+    border-radius: 14px;
+    cursor: pointer;
+    box-shadow: 0 6px 16px rgba(20, 35, 63, .25);
+    transition: background-color .2s, transform .12s, box-shadow .2s;
+  }
+  .btn:hover:not(:disabled) { background: var(--navy-2); }
+  .btn:active:not(:disabled) { transform: translateY(1px) scale(.99); box-shadow: 0 3px 8px rgba(20, 35, 63, .25); }
+  .btn:disabled { cursor: not-allowed; opacity: .75; }
+  .btn svg { width: 20px; height: 20px; }
+
+  .spinner {
+    width: 20px; height: 20px;
+    border: 3px solid rgba(255, 255, 255, .35);
+    border-top-color: #fff;
+    border-radius: 50%;
+    animation: spin .8s linear infinite;
+  }
+  .spinner[hidden] { display: none; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* ========== رسالة الفشل ========== */
+  .status {
+    display: flex;
+    gap: .7rem;
+    padding: .9rem 1rem;
+    color: var(--err);
+    background: var(--err-bg);
+    border: 1px solid #f0c4c0;
+    border-radius: 12px;
+    font-weight: 500;
+  }
+  .status[hidden] { display: none; }
+  .status svg { flex: none; width: 22px; height: 22px; margin-top: .15rem; }
+  .status p { margin: 0; }
+  .status small { display: block; margin-top: .15rem; font-weight: 400; color: #7d2a25; }
+
+  /* ========== شاشة النجاح ========== */
+  .success { text-align: center; animation: pop .45s ease both; }
+  .success[hidden] { display: none; }
+  .success .tick {
+    display: grid;
+    place-items: center;
+    width: 76px; height: 76px;
+    margin: .5rem auto 1.1rem;
+    color: var(--ok);
+    background: var(--ok-bg);
+    border-radius: 50%;
+  }
+  .success .tick svg { width: 42px; height: 42px; }
+  .success h2 { margin: 0 0 .5rem; font-size: 1.45rem; color: var(--ok); }
+  .success h2:focus { outline: none; }
+  .success p { margin: 0 auto; max-width: 28rem; color: var(--ink); }
+  .receipt {
+    display: inline-block;
+    max-width: 100%;
+    margin-top: 1.2rem;
+    padding: .7rem 1.1rem;
+    background: #f4f7fa;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    font-weight: 600;
+    overflow-wrap: anywhere;
+  }
+  .receipt small { display: block; font-weight: 400; color: var(--muted); font-size: .82rem; }
+  @keyframes pop { from { opacity: 0; transform: translateY(8px) scale(.98); } to { opacity: 1; transform: none; } }
+
+  .sr-only {
+    position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0;
+    overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+  }
+
+  @media (max-width: 420px) {
+    .card-head .mono { font-size: 10rem; top: -2rem; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; }
+    .spinner { animation-duration: 1.5s !important; }
+  }
+</style>
+</head>
+
+<body>
+<!-- أيقونات SVG مضمّنة (بدون أي مكتبات خارجية) -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <defs>
+    <symbol id="i-user" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21v-1a6 6 0 0 1 6-6h4a6 6 0 0 1 6 6v1"/></symbol>
+    <symbol id="i-cap" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10 12 5 2 10l10 5 10-5z"/><path d="M6 12v5c0 1.5 3 3 6 3s6-1.5 6-3v-5"/></symbol>
+    <symbol id="i-alert" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><path d="M12 9v4"/><path d="M12 17h.01"/></symbol>
+    <symbol id="i-err" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v4"/><path d="M12 16h.01"/></symbol>
+    <symbol id="i-ok" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m8 12 3 3 5-6"/></symbol>
+    <symbol id="i-send" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m22 2-7 20-4-9-9-4 20-7z"/><path d="M22 2 11 13"/></symbol>
+  </defs>
+</svg>
+
+<main class="shell">
+  <article class="card">
+
+    <header class="card-head">
+      <span class="mono" aria-hidden="true">B</span>
+      <span class="badge">
+        <svg aria-hidden="true"><use href="#i-cap"/></svg>
+        التسجيل مخصص لطلبة شعبة B فقط
+      </span>
+      <h1>تسجيل أسماء طلبة شعبة B</h1>
+      <p>يرجى تسجيل الاسم الرباعي بدقة والتأكد من صحة المعلومات قبل إرسال التسجيل.</p>
+    </header>
+
+    <form id="regForm" class="stack" novalidate autocomplete="off">
+
+      <!-- 1) الاسم الرباعي -->
+      <div>
+        <label class="label" for="fullName">الاسم الرباعي<span class="req" aria-hidden="true">*</span></label>
+        <p class="hint" id="nameHint">اكتب الاسم بالعربية، أربعة أجزاء على الأقل مفصولة بمسافات.</p>
+        <div class="field">
+          <svg class="lead" aria-hidden="true"><use href="#i-user"/></svg>
+          <input type="text" id="fullName" name="fullName" dir="rtl" lang="ar"
+                 placeholder="مثال: أحمد محمد علي حسن"
+                 maxlength="120" autocapitalize="off" autocorrect="off" spellcheck="false"
+                 aria-required="true" aria-describedby="nameHint nameError">
+        </div>
+        <p class="error" id="nameError" hidden aria-live="polite"><svg aria-hidden="true"><use href="#i-err"/></svg><span></span></p>
+      </div>
+
+      <!-- 2) تأكيد الشعبة -->
+      <fieldset>
+        <legend>تأكيد الشعبة<span class="req" aria-hidden="true">*</span></legend>
+        <label class="check" id="confirmWrap">
+          <input type="checkbox" id="confirmB" name="confirmB" aria-required="true" aria-describedby="confirmError">
+          <span>أؤكد أنني من طلبة شعبة B.</span>
+        </label>
+        <p class="error" id="confirmError" hidden aria-live="polite"><svg aria-hidden="true"><use href="#i-err"/></svg><span></span></p>
+      </fieldset>
+
+      <!-- 3) خيار اختياري: الانتقال من شعبة أخرى -->
+      <fieldset>
+        <legend>الانتقال من شعبة أخرى <span style="font-weight:400;color:var(--muted)">(اختياري)</span></legend>
+        <label class="check">
+          <input type="checkbox" id="isTransfer" name="isTransfer" aria-controls="transferReveal" aria-expanded="false">
+          <span>أنا طالب انتقلت هذا العام من شعبة أخرى إلى شعبة B.</span>
+        </label>
+
+        <div class="reveal" id="transferReveal" inert>
+          <div class="reveal-inner">
+            <div class="reveal-body">
+              <label class="label" for="previousSection">الشعبة التي انتقلت منها<span class="req" aria-hidden="true">*</span></label>
+              <select id="previousSection" name="previousSection" disabled aria-describedby="prevError">
+                <option value="" selected>اختر الشعبة السابقة</option>
+                <!-- تُملأ الخيارات من المصفوفة المسموحة في JavaScript (بدون الحرف B) -->
+              </select>
+              <p class="error" id="prevError" hidden aria-live="polite"><svg aria-hidden="true"><use href="#i-err"/></svg><span></span></p>
+            </div>
+          </div>
+        </div>
+      </fieldset>
+
+      <!-- 4) التنبيه -->
+      <div class="notice" role="note">
+        <svg aria-hidden="true"><use href="#i-alert"/></svg>
+        <p><strong>تنبيه مهم:</strong> سيتم اعتماد الاسم المسجل من قبل التدريسيين، لذا يرجى كتابة الاسم الرباعي بصورة صحيحة ودقيقة. يتحمل الطالب مسؤولية التأكد من صحة الاسم قبل الإرسال.</p>
+      </div>
+
+      <!-- حالة الفشل -->
+      <div class="status" id="formStatus" role="alert" hidden>
+        <svg aria-hidden="true"><use href="#i-err"/></svg>
+        <p><span id="statusMain">تعذر إرسال التسجيل حاليًا. يرجى المحاولة مرة أخرى بعد قليل.</span><small id="statusDetail" hidden></small></p>
+      </div>
+
+      <!-- 5) زر الإرسال -->
+      <button type="submit" class="btn" id="submitBtn">
+        <svg id="btnIcon" aria-hidden="true"><use href="#i-send"/></svg>
+        <span class="spinner" id="btnSpinner" hidden aria-hidden="true"></span>
+        <span id="btnText">تأكيد التسجيل</span>
+      </button>
+    </form>
+
+    <!-- شاشة النجاح -->
+    <section class="success" id="successView" hidden aria-labelledby="successTitle">
+      <div class="tick"><svg aria-hidden="true"><use href="#i-ok"/></svg></div>
+      <h2 id="successTitle" tabindex="-1">تم إرسال تسجيلك بنجاح</h2>
+      <p>تم إرسال تسجيلك بنجاح. شكرًا لك، يرجى التأكد من كتابة اسمك بصورة صحيحة.</p>
+      <div class="receipt"><small>الاسم المُرسل</small><span id="receiptName"></span></div>
+    </section>
+
+  </article>
+</main>
+
+<script>
+(() => {
+  'use strict';
+
+  /* ================================================================
+     الإعدادات
+     ================================================================ */
+  const WORKER_URL = 'https://square-voice-3ce9.alaswedraad.workers.dev';
+  const REQUEST_TIMEOUT_MS = 15000;               // مهلة الطلب
+  const CURRENT_SECTION = 'B';
+  const ALLOWED_PREVIOUS_SECTIONS = ['A', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J']; // بدون B
+  const MIN_NAME_PARTS = 4;
+  const MAX_NAME_LENGTH = 100;
+
+  const MSG = {
+    nameEmpty:   'يرجى كتابة الاسم الرباعي.',
+    nameChars:   'يرجى استخدام الحروف فقط، دون أرقام أو رموز.',
+    nameParts:   'الاسم غير مكتمل. اكتب أربعة أجزاء على الأقل، مفصولة بمسافات.',
+    namePartLen: 'يوجد جزء ناقص في الاسم. تأكد من كتابة كل جزء بالكامل.',
+    nameLong:    'الاسم طويل أكثر من اللازم. يرجى التحقق منه.',
+    confirm:     'يجب تأكيد أنك من طلبة شعبة B قبل الإرسال.',
+    prev:        'يرجى اختيار الشعبة التي انتقلت منها.',
+    sendFailed:  'تعذر إرسال التسجيل حاليًا. يرجى المحاولة مرة أخرى بعد قليل.',
+    offline:     'يبدو أن الاتصال بالإنترنت غير متوفر.',
+    timeout:     'استغرق الطلب وقتًا أطول من المتوقع.'
+  };
+
+  /* ================================================================
+     العناصر
+     ================================================================ */
+  const $ = (id) => document.getElementById(id);
+  const form = $('regForm');
+  const nameInput = $('fullName');
+  const confirmBox = $('confirmB');
+  const confirmWrap = $('confirmWrap');
+  const transferBox = $('isTransfer');
+  const reveal = $('transferReveal');
+  const prevSelect = $('previousSection');
+  const submitBtn = $('submitBtn');
+  const btnText = $('btnText');
+  const btnIcon = $('btnIcon');
+  const btnSpinner = $('btnSpinner');
+  const statusBox = $('formStatus');
+  const statusDetail = $('statusDetail');
+  const successView = $('successView');
+
+  let isSubmitting = false;
+
+  // ملء القائمة من المصفوفة المسموحة فقط
+  ALLOWED_PREVIOUS_SECTIONS.forEach((letter) => {
+    const opt = document.createElement('option');
+    opt.value = letter;
+    opt.textContent = letter;
+    prevSelect.appendChild(opt);
+  });
+
+  /* ================================================================
+     أدوات مساعدة
+     ================================================================ */
+  // تنظيف الاسم: إزالة محارف الاتجاه الخفية، دمج المسافات المتكررة، قص الأطراف
+  function normalizeName(value) {
+    return String(value)
+      .replace(/[\u200B-\u200F\u202A-\u202E\u2066-\u2069\uFEFF]/g, '')
+      .replace(/\s+/g, ' ')
+      .trim();
+  }
+
+  // يقبل الحروف (عربية أو غيرها) والتشكيل والمسافة والشرطة والفاصلة العليا فقط
+  const NAME_CHARS = /^[\p{L}\p{M}'’\-\s]+$/u;
+
+  function validateName(name) {
+    if (!name) return MSG.nameEmpty;
+    if (name.length > MAX_NAME_LENGTH) return MSG.nameLong;
+    if (!NAME_CHARS.test(name)) return MSG.nameChars;
+    const parts = name.split(' ');
+    if (parts.length < MIN_NAME_PARTS) return MSG.nameParts;
+    // كل جزء يجب أن يحتوي حرفين على الأقل (دون احتساب التشكيل)
+    const tooShort = parts.some((p) => p.replace(/[\p{M}'’\-]/gu, '').length < 2);
+    if (tooShort) return MSG.namePartLen;
+    return '';
+  }
+
+  function setError(input, errEl, message, wrap) {
+    const span = errEl.querySelector('span');
+    if (message) {
+      span.textContent = message;
+      errEl.hidden = false;
+      if (input) input.setAttribute('aria-invalid', 'true');
+      if (wrap) wrap.classList.add('invalid');
+    } else {
+      span.textContent = '';
+      errEl.hidden = true;
+      if (input) input.removeAttribute('aria-invalid');
+      if (wrap) wrap.classList.remove('invalid');
+    }
+  }
+
+  const nameError = $('nameError');
+  const confirmError = $('confirmError');
+  const prevError = $('prevError');
+
+  function checkName(normalizeField) {
+    const clean = normalizeName(nameInput.value);
+    if (normalizeField) nameInput.value = clean;
+    const msg = validateName(clean);
+    setError(nameInput, nameError, msg);
+    return !msg;
+  }
+  function checkConfirm() {
+    const ok = confirmBox.checked;
+    setError(confirmBox, confirmError, ok ? '' : MSG.confirm, confirmWrap);
+    return ok;
+  }
+  function checkPrev() {
+    if (!transferBox.checked) { setError(prevSelect, prevError, ''); return true; }
+    const ok = ALLOWED_PREVIOUS_SECTIONS.includes(prevSelect.value);
+    setError(prevSelect, prevError, ok ? '' : MSG.prev);
+    return ok;
+  }
+
+  function hideStatus() {
+    statusBox.hidden = true;
+    statusDetail.hidden = true;
+    statusDetail.textContent = '';
+  }
+  function showFailure(detail) {
+    if (detail) { statusDetail.textContent = detail; statusDetail.hidden = false; }
+    else { statusDetail.hidden = true; statusDetail.textContent = ''; }
+    statusBox.hidden = false;
+  }
+
+  function setLoading(loading) {
+    isSubmitting = loading;
+    submitBtn.disabled = loading;
+    submitBtn.setAttribute('aria-busy', String(loading));
+    btnSpinner.hidden = !loading;
+    btnIcon.style.display = loading ? 'none' : '';
+    btnText.textContent = loading ? 'جارٍ إرسال التسجيل...' : 'تأكيد التسجيل';
+  }
+
+  /* ================================================================
+     التفاعلات
+     ================================================================ */
+  let nameTouched = false;
+  nameInput.addEventListener('input', () => { if (nameTouched) checkName(false); hideStatus(); });
+  nameInput.addEventListener('blur', () => { nameTouched = true; checkName(true); });
+
+  confirmBox.addEventListener('change', () => { if (confirmBox.checked) checkConfirm(); hideStatus(); });
+
+  transferBox.addEventListener('change', () => {
+    const on = transferBox.checked;
+    reveal.classList.toggle('open', on);
+    reveal.inert = !on;
+    prevSelect.disabled = !on;
+    transferBox.setAttribute('aria-expanded', String(on));
+    if (!on) {
+      // مسح القيمة والخطأ حتى لا تُرسل بيانات قديمة
+      prevSelect.value = '';
+      setError(prevSelect, prevError, '');
+    }
+    hideStatus();
+  });
+
+  prevSelect.addEventListener('change', () => { checkPrev(); hideStatus(); });
+
+  /* ================================================================
+     الإرسال إلى Cloudflare Worker
+     ================================================================ */
+
+  // عقد الاستجابة المتوقع من الـ Worker (عدّل هذه الدالة إن كان الـ Worker يعيد صيغة مختلفة):
+  // نعتبر العملية ناجحة فقط إذا كانت حالة HTTP ضمن 2xx والجسم JSON يحتوي ok:true أو success:true.
+  // لا نعرض النجاح لمجرد أن الطلب وصل.
+  async function isSuccessfulResponse(response) {
+    if (!response.ok) return false;
+    let data;
+    try { data = await response.json(); } catch (_) { return false; }
+    return !!data && (data.ok === true || data.success === true);
+  }
+
+  async function sendToWorker(payload) {
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
+    try {
+      const response = await fetch(WORKER_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' }, // يستلزم أن يعالج الـ Worker طلب OPTIONS (CORS)
+        body: JSON.stringify(payload),
+        signal: controller.signal,
+        cache: 'no-store',
+        credentials: 'omit',
+        referrerPolicy: 'no-referrer'
+      });
+      return await isSuccessfulResponse(response);
+    } finally {
+      clearTimeout(timer);
+    }
+  }
+
+  form.addEventListener('submit', async (event) => {
+    event.preventDefault();
+    if (isSubmitting) return; // منع الإرسال المتكرر
+
+    hideStatus();
+
+    const validName = checkName(true);
+    const validConfirm = checkConfirm();
+    const validPrev = checkPrev();
+
+    // نقل التركيز إلى أول حقل يحتاج تصحيحًا
+    if (!validName) { nameInput.focus(); return; }
+    if (!validConfirm) { confirmBox.focus(); return; }
+    if (!validPrev) { prevSelect.focus(); return; }
+
+    const fullName = normalizeName(nameInput.value);
+    const isTransferStudent = transferBox.checked;
+    const previousSection = isTransferStudent ? prevSelect.value : null;
+
+    // حماية إضافية: لا نرسل أبدًا شعبة سابقة غير مسموحة
+    if (isTransferStudent && !ALLOWED_PREVIOUS_SECTIONS.includes(previousSection)) { checkPrev(); prevSelect.focus(); return; }
+
+    const payload = {
+      fullName,
+      section: CURRENT_SECTION,
+      isTransferStudent,
+      previousSection,
+      submittedAt: new Date().toISOString()
+    };
+
+    if (!navigator.onLine) { showFailure(MSG.offline); return; }
+
+    setLoading(true);
+    try {
+      const ok = await sendToWorker(payload);
+      if (!ok) { showFailure(''); return; }
+
+      // نجاح فعلي: عرض الاسم بأمان عبر textContent (بدون innerHTML)
+      $('receiptName').textContent = fullName;
+      form.hidden = true;
+      successView.hidden = false;
+      $('successTitle').focus();
+      successView.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    } catch (err) {
+      // تُعرض رسالة فشل دائمًا؛ التفاصيل في وحدة التحكم لتسهيل تشخيص CORS
+      console.error('Registration request failed:', err);
+      showFailure(err && err.name === 'AbortError' ? MSG.timeout : (!navigator.onLine ? MSG.offline : ''));
+    } finally {
+      setLoading(false); // إعادة تفعيل الزر مع بقاء بيانات النموذج
+    }
+  });
+})();
+</script>
+</body>
+</html>
